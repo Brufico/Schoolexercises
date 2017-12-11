@@ -1,0 +1,2 @@
+# Schoolexercises
+Exercises and cases
