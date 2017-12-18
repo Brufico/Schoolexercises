@@ -1,0 +1,126 @@
+Problem Experienced;date;downtime (minutes)
+Weekly Virus Scan;03/01/2016;45
+Lockup;03/01/2016;25
+Memory Errors;05/01/2016;14
+Memory Errors;06/01/2016;10
+Lockup;08/01/2016;26
+Weekly Virus Scan;10/01/2016;43
+Lockup;10/01/2016;22
+Memory Errors;11/01/2016;10
+Memory Errors;11/01/2016;19
+Lockup;16/01/2016;42
+Weekly Virus Scan;17/01/2016;45
+high temperature shutdown;17/01/2016;74
+Slow Startup;19/01/2016;10
+Weekly Virus Scan;24/01/2016;44
+Memory Errors;24/01/2016;30
+Manual Re-start;25/01/2016;10
+Memory Errors;27/01/2016;14
+Memory Errors;28/01/2016;30
+Memory Errors;29/01/2016;9
+Weekly Virus Scan;31/01/2016;44
+Memory Errors;01/02/2016;12
+Memory Errors;05/02/2016;10
+Weekly Virus Scan;07/02/2016;45
+Memory Errors;10/02/2016;16
+Weekly Virus Scan;14/02/2016;48
+Memory Errors;17/02/2016;10
+Slow Startup;18/02/2016;10
+Memory Errors;19/02/2016;20
+Weekly Virus Scan;21/02/2016;46
+Lockup;24/02/2016;37
+Weekly Virus Scan;28/02/2016;48
+Memory Errors;29/02/2016;30
+Memory Errors;29/02/2016;10
+Lockup;29/02/2016;33
+Lockup;03/03/2016;32
+Disk failure;04/03/2016;62
+Weekly Virus Scan;06/03/2016;42
+Memory Errors;11/03/2016;33
+Memory Errors;12/03/2016;28
+Lockup;12/03/2016;26
+Weekly Virus Scan;13/03/2016;48
+Hardware upgrade;18/03/2016;26
+Memory Errors;18/03/2016;29
+Weekly Virus Scan;20/03/2016;44
+Memory Errors;20/03/2016;28
+Weekly Virus Scan;27/03/2016;46
+Weekly Virus Scan;03/04/2016;47
+Memory Errors;04/04/2016;18
+Memory Errors;05/04/2016;16
+Memory Errors;06/04/2016;27
+Weekly Virus Scan;10/04/2016;47
+Memory Errors;10/04/2016;20
+Lockup;12/04/2016;45
+Weekly Virus Scan;17/04/2016;41
+Hardware upgrade;20/04/2016;27
+Memory Errors;21/04/2016;17
+Memory Errors;22/04/2016;26
+Weekly Virus Scan;24/04/2016;48
+Lockup;25/04/2016;28
+Manual Re-start;26/04/2016;10
+Weekly Virus Scan;01/05/2016;45
+Memory Errors;02/05/2016;16
+Memory Errors;05/05/2016;14
+Weekly Virus Scan;08/05/2016;45
+Lockup;08/05/2016;22
+Memory Errors;09/05/2016;39
+Memory Errors;10/05/2016;30
+Weekly Virus Scan;15/05/2016;45
+Lockup;21/05/2016;29
+Weekly Virus Scan;22/05/2016;50
+Lockup;24/05/2016;38
+Weekly Virus Scan;29/05/2016;44
+Memory Errors;29/05/2016;14
+Memory Errors;02/06/2016;10
+Weekly Virus Scan;05/06/2016;46
+Memory Errors;08/06/2016;23
+Weekly Virus Scan;12/06/2016;45
+Memory Errors;12/06/2016;30
+Memory Errors;12/06/2016;18
+Disk failure;12/06/2016;175
+Slow Startup;14/06/2016;10
+Memory Errors;16/06/2016;16
+Weekly Virus Scan;19/06/2016;42
+Memory Errors;19/06/2016;16
+Memory Errors;20/06/2016;22
+Memory Errors;22/06/2016;13
+Lockup;24/06/2016;30
+Memory Errors;24/06/2016;35
+Weekly Virus Scan;26/06/2016;44
+Memory Errors;28/06/2016;16
+Memory Errors;01/07/2016;10
+Weekly Virus Scan;03/07/2016;45
+Slow Startup;09/07/2016;10
+Weekly Virus Scan;10/07/2016;46
+Memory Errors;12/07/2016;21
+Weekly Virus Scan;17/07/2016;45
+Memory Errors;19/07/2016;16
+Memory Errors;21/07/2016;7
+Lockup;21/07/2016;25
+Memory Errors;23/07/2016;6
+Disk failure;23/07/2016;230
+Weekly Virus Scan;24/07/2016;45
+Lockup;24/07/2016;37
+Memory Errors;26/07/2016;25
+Manual Re-start;27/07/2016;10
+Memory Errors;28/07/2016;33
+Weekly Virus Scan;31/07/2016;45
+Memory Errors;02/08/2016;19
+Memory Errors;02/08/2016;27
+Lockup;06/08/2016;43
+Weekly Virus Scan;07/08/2016;47
+Memory Errors;11/08/2016;22
+Hardware upgrade;12/08/2016;20
+Slow Startup;13/08/2016;10
+Weekly Virus Scan;14/08/2016;44
+Memory Errors;14/08/2016;38
+Lockup;15/08/2016;33
+Disk failure;18/08/2016;119
+Memory Errors;19/08/2016;14
+Memory Errors;20/08/2016;20
+Weekly Virus Scan;21/08/2016;48
+Lockup;24/08/2016;24
+Memory Errors;26/08/2016;33
+Memory Errors;27/08/2016;23
+Weekly Virus Scan;28/08/2016;48

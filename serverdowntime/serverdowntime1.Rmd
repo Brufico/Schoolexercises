@@ -1,0 +1,278 @@
+---
+title: "Server Downtime"
+subtitle: "file: serverdowntime1.Rmd"
+author: "Bruno Fischer Colonimos"
+date: "11 décembre 2017"
+output: 
+    # html_document:
+    #     number_sections: yes
+    #     toc: yes
+    #     toc_depth: 3
+    pdf_document:
+        number_sections: yes
+        toc: yes
+        toc_depth: 3
+---
+
+------------------------------------------------------------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 3, fig.align = "center", fig.pos = "H")
+```
+
+
+
+```{r libs, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+```
+
+```{r showdirect}
+show_now <- FALSE
+```
+
+
+```{r code}
+vlookup <- function(value, searchtable, searchcol = 1, returncol= 2){
+        searchtable[match(value, searchtable[[searchcol]]), returncol]
+}
+```
+
+
+
+
+```{r data}
+setwd("~/R/Schoolexercises/serverdowntime")
+datadir <- "data"
+fname <- "serverevents.csv"
+# file.exists(file.path(datadir, fname))
+# dir(datadir)
+df <- read.csv2(file.path(datadir, fname), sep = ";")
+colnames(df) <- c("Problem", "Date", "Downtime")
+df$Freq <- 1
+```
+
+```{r freq, warning=FALSE, message=FALSE}
+# 1.  Construct a frequency distribution showing the number of times the server was down for each downtime cause
+
+df_freq <- df %>%
+        group_by(Problem) %>%
+        summarise(Freq=sum(Freq)) %>%
+        arrange(desc(Freq)) %>%
+        mutate(Rfreq = Freq / sum(Freq)) %>%
+        mutate(Rfreq = paste0(100 * round(Rfreq, 2), "%"))
+
+if (show_now) {
+        kable(df_freq)
+}
+ 
+# 2.  Develop a bar chart that displays the data from the frequency distribution in question 1. 
+
+# order levels by frequency
+df$Problem <- reorder(df$Problem, -df$Freq, FUN = sum)
+
+bar_freq <- ggplot(df, aes(x = Problem)) + 
+        geom_bar() + 
+        theme(axis.text.x = element_text(angle = 45, 
+                                         # vjust = -1,
+                                         hjust = 1))
+
+if (show_now) { bar_freq }
+```
+
+
+```{r hist_downtime}
+# 3.  Develop a histogram that displays the downtime data.
+
+nc <- sapply( list(nclass.Sturges, nclass.scott, nclass.FD), 
+              function(f) {f(df$Downtime)} )
+
+hist_downtime <- ggplot(df, aes(x = Downtime)) + 
+        geom_histogram( bins = 12)
+
+if (show_now) { hist_downtime }
+```
+
+```{r type_downtime, fig.asp= 1.2}
+# 4.  How does the type of problem experienced affect downtime?
+
+df_pb_downtime <- 
+        df %>%
+        group_by(Problem) %>%
+        summarise(meantime=mean(Downtime),
+                  sdtime=sd(Downtime)) %>%
+        arrange(desc(meantime)) %>%
+        mutate(labels = paste0("mean=", round(meantime, 0), " mn" ),
+               y = 25)
+
+if (show_now) {kable(df_pb_downtime)}
+
+hist_type_downtime <- 
+        ggplot(df, aes(x=Downtime, fill = Problem)) +
+        geom_histogram(bins = 24, color = "black") +
+        facet_grid(Problem ~. , switch = "y") +
+        geom_vline(data = df_pb_downtime, aes(xintercept = meantime ), size=0.5 ) +
+        geom_text(data = df_pb_downtime, aes(x = meantime, y = y, label = labels ),
+                  hjust = -0.1, size = 3) +
+        labs(x= "Downtime per incident") +
+        theme(legend.position = "none", 
+              strip.text.y = element_text(angle = 180),
+              plot.title = element_text(h=0.5) )
+
+if (show_now) { hist_type_downtime }
+
+```
+
+```{r}
+# 5.  Develop a pie chart that breaks down the percentage of
+# total downtime that is attributed to each downtime cause
+# during the period
+
+# supparise
+
+totaltime_df <- df %>%
+        group_by(Problem) %>%
+        summarise(totaltime = sum(Downtime)) %>%
+        mutate(Dtime_percent = totaltime / sum(totaltime)) %>%
+        arrange(desc(totaltime))
+
+if (show_now) kable(totaltime_df, digits = 2)
+
+# labels
+totaltime_df$Problem <- reorder(totaltime_df$Problem, totaltime_df$Dtime_percent)
+totaltime_df$ymax <- Reduce('+', totaltime_df$Dtime_percent, accumulate = TRUE)
+totaltime_df$ymin <- c(0, totaltime_df$ymax[1:(length(totaltime_df$Problem)-1)])
+totaltime_df$ypos <- (totaltime_df$ymax + totaltime_df$ymin)/2
+totaltime_df$xpos <- rep(1.3, nrow(totaltime_df))
+totaltime_df$ylabs <- ifelse(totaltime_df$Dtime_percent> 0.04,
+                             paste0(as.character(100 * round(totaltime_df$Dtime_percent, 2)),"%"), 
+                             "")
+totaltime_pie <- 
+ggplot(data = totaltime_df, 
+       mapping = aes(x = "", y = Dtime_percent, fill = Problem)) + 
+        geom_bar(width = 1, stat = "identity", color = "black") + 
+        scale_fill_discrete(guide = guide_legend(reverse = TRUE, title = "Problems")) +
+        scale_y_continuous(name = NULL, labels=NULL, breaks=NULL) +
+        scale_x_discrete(name = NULL) +
+        coord_polar("y", start = 0) +
+        geom_text(aes(x = xpos, y = ypos, label = ylabs)) +
+        labs(title = "Only four incident types really count") +
+        theme(plot.title = element_text(h=0.5))
+
+
+
+if (show_now) totaltime_pie
+
+
+```
+
+
+<!-- 6.  Prepare a short written report that discusses the downtime data. --> 
+<!--  Make sure you merge the graphs and charts into the report.   -->
+
+Executive Summary {-}
+=================
+
+In this report, we analyze the causes of server downtime  for a client of EDS. Using exploratory analysis, we identify the four most inpactful server downtime causes as :
+
+* Weekly Virus scan
+* Memory Errors
+* Lockups
+* Disk failures
+
+Thiese results suggests that reducing the frequency or the downtime per incident of one of these four incidents types is the most promising way to improve the downtime situation.
+
+------------------------------------------------------------
+
+The problem
+===========
+The problem consists in analyzing the douwntime at servers of one of EDS's clients, and suggest approaches to improve the situation.
+
+The Data
+========
+The data lists all the server incidents that occured from January to August 2016. It has been compiled by the IT department of the client.
+
+
+Short exploratory analysis
+===========================
+
+Incident types frequency and consecutive downtime
+--------------------------------------------------
+
+```{r one, fig.show = "hold", fig.asp = 1}
+centertitle = theme(plot.title = element_text(h = 0.5))
+
+bar_freq + labs(title = "Most frequent incident types") +
+        centertitle
+hist_downtime +  labs(x= "Downtime(minutes)", title = "Downtime per incident")+
+        centertitle
+```
+
+```{r}
+kable(df_freq)
+```
+
+
+
+
+```{r, fig.width= 6, fig.asp=.6 }
+hist_type_downtime + labs(title = "Downtime strongly depends on problem type")
+```
+
+Total downtime by problem type
+------------------------------
+
+```{r,fig.width=6}
+totaltime_pie
+```
+
+The most impactful problem type is the weekly viruscan (`r totaltime_df$ylabs[1]` of the total downtime)
+
+Conclusion
+===========
+
+```{r, include=FALSE}
+
+# make a table for the results
+# short tables
+short_totaltime <- select(totaltime_df, Problem, ylabs ) %>% rename(totalpc = ylabs)
+short_freq <- select(df_freq, Problem, Rfreq ) %>% rename(incidentpc = Rfreq)
+short_mdowntime <- select(df_pb_downtime, Problem, meantime ) %>% 
+        mutate(meantime = round(meantime, 0))
+# combine the short tables and convert the factor to character
+summarytable <- merge( merge(short_totaltime, 
+                             short_freq, by = "Problem" ), 
+                       short_mdowntime) %>% 
+        mutate(Problem = as.character(Problem))
+
+```
+
+
+
+There are four types of events which have a sizeable impact on the total downtime:
+
+1. Weekly Virus Scan : `r item <- "Weekly Virus Scan"` 
+    * `r vlookup(item, summarytable, "Problem", "totalpc" )` of total downtime
+    * frequent problem (`r vlookup(item, summarytable, "Problem", "incidentpc" )` of incidents)
+    * long downtime per incident (mean = `r  vlookup(item, summarytable, "Problem", "meantime" )` minutes)
+
+2. Memory errors `r item <- "Memory Errors"` 
+    * `r vlookup(item, summarytable, "Problem", "totalpc" )` of total downtime
+    * most frequent problem (`r vlookup(item, summarytable, "Problem", "incidentpc" )` of incidents)
+    * medium-short downtime per incident (mean = `r  vlookup(item, summarytable, "Problem", "meantime" )` minutes)
+
+3. Lockups`r item <- "Lockup"` 
+    * `r vlookup(item, summarytable, "Problem", "totalpc" )` of total downtime)
+    * less frequent problem (`r vlookup(item, summarytable, "Problem", "incidentpc" )` of incidents)
+    * average downtime per incident (mean = `r  vlookup(item, summarytable, "Problem", "meantime" )` minutes)
+
+4. Disk failure`r item <- "Disk failure"` 
+    * `r vlookup(item, summarytable, "Problem", "totalpc" )` of total downtime)
+    * rare problem (`r vlookup(item, summarytable, "Problem", "incidentpc" )` of incidents)
+    * Very long downtime per incident (mean = `r  vlookup(item, summarytable, "Problem", "meantime" )` minutes). Addionnally, one can note the high variability of the downtime per incident for this type of problem, which suggest that studying the context of the four previous incidents may yield methods to strongly reduce the mean downtimeper incident.
+
+The other problem types are less important from the point of view of total downtime, and even a substantial improvement of the downtime of one of these other events cannot result in a sizable improvement of the total downtime. 
+
+**Recommendation**: These results show that shortening the average downtime per incident or reducing the frequency of the first four types of problems would be the most promising approaches to the problem of minimizing the total downtime.
+
