@@ -58,6 +58,7 @@ g_bar <- function(varstr, dfr = df) {
 }
 # actual
 g_bar("studage")
+g_bar("lectage")
 g_bar("service")
 g_bar("dept")
 
@@ -112,26 +113,26 @@ ybar_by <- function(vrow = "." , vcol = ".",
                         dframe
                 }
         }
-        
+
         # compute dataframe of conditional means
         mean_y_df <- df %>%
                 groupif(vrow, vcol, mvrow, mvcol ) %>%
                 summarise(mean_y = mean(y))
-        
+
         # make the ggplot
-        plot <- ggplot(data = df, aes(y)) + 
+        plot <- ggplot(data = df, aes(y)) +
                 geom_bar( aes(y = ..prop..), width = 0.5, fill = colfill) +
                 geom_vline(data = mean_y_df, aes(xintercept = mean_y), color = meancolor) +
                 geom_text(data = mean_y_df, aes(x = mean_y, y = labheight, label = format(mean_y, digits = meandigits)),
                           color = meancolor, hjust = labjust)
-        
-        
+
+
         # + myfacet(vrow, vcol)
-        
+
         if (!mvrow | !mvcol) {
                 plot <- plot + myfacet(row = vrow, col = vcol)
         }
-        
+
         # add title to plot
         if (condpresent <= 0) {
                 plot_title <- "Y distribution and mean"
@@ -142,10 +143,10 @@ ybar_by <- function(vrow = "." , vcol = ".",
         } else {
                 stop( paste0("Error in ybar-by2: bad value for condpresent: ", condpresent) , call. = TRUE )
         }
-                 
-        # return plot        
+
+        # return plot
         plot + labs(title = plot_title)
-                
+
 }
 
 # -----------------------------------------------------------------------------------------
@@ -171,19 +172,19 @@ ybar_by("dept", "service") # evidence of interaction
 
 
 
-ybox_by <- function(vx, vrow = "." , vcol = "." , 
+ybox_by <- function(vx, vrow = "." , vcol = "." ,
                     meansize = 4, meandigits = 3, meancolor = "red",
                     labheight = .2, labjust = -.2) { # all args = strings
         # missing arguments
         mvrow <- missing(vrow)
         mvcol <- missing(vcol)
         condpresent <- 2 - (as.integer(mvrow) + as.integer(mvcol))
-        
+
         # preparation for circomventing nse
         xn <- as.name(vx)
         yn <- as.name("y")
         # compute the means by groups ----------
-        
+
         # function for grouping dataframes
         groupif3 <- function(dframe, vx, vrow, vcol, mvrow, mvcol) {
                 xvar <- as.name(vx)
@@ -199,28 +200,28 @@ ybox_by <- function(vx, vrow = "." , vcol = "." ,
                         group_by_(dframe, xvar)
                 }
         }
-        
+
         # compute dataframe of conditional means
         mean_y_df <- df %>%
                 groupif3(vx, vrow, vcol, mvrow, mvcol ) %>%
                 summarise(mean_y = mean(y))
-        
+
         # make the ggplot
-        
-        plot <- ggplot(data = df, 
+
+        plot <- ggplot(data = df,
                        aes_(xn, yn, group = xn) ) +
-                geom_boxplot(width = 0.5) +
+                geom_boxplot(width = 0.5, varwidth = TRUE) +
                 geom_point(data = mean_y_df, aes(y = mean_y), size = meansize, color = meancolor, alpha = .5 ) +
                 geom_line(data = mean_y_df, aes_(xn, quote(mean_y), group = 1), color = meancolor) +
                 geom_text(data = mean_y_df, aes(y = mean_y, label = format(mean_y, digits = meandigits)),
                           hjust = labjust) # + geom_smooth(aes_(xn, yn), method = "lm")
-        
+
         if (!mvrow | !mvcol) {
                 plot <- plot + myfacet(row = vrow, col = vcol)
         }
-                
-        
-        
+
+
+
         # add title to plot
         if (condpresent <= 0) {
                 plot_title <- paste0("Y distribution and mean by ", vx)
@@ -234,7 +235,7 @@ ybox_by <- function(vx, vrow = "." , vcol = "." ,
 
         # return plot
         plot  + labs(title = plot_title)
-        
+
 }
 
 
@@ -253,3 +254,10 @@ ybox_by("lectage", "dept", "service", meancolor = "blue", meansize = 3)
 
 
 
+# approaches by the mean:
+
+mdf <- df %>%
+        group_by(studage, lectage, service, dept) %>%
+        summarise(mean_y = mean(y), cnt = n())
+
+summary(mdf$mean_y)
