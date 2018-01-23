@@ -48,6 +48,29 @@ sapply(df, function(col) {sum(is.na(col))} )
 tail(df)
 
 
+#  essais par etudiants
+
+unique(df$d)
+
+
+df1 <- df[df$d == 1002,]
+df1 <- arrange(df1, service, dept)
+
+# by student
+dfs <- df %>%
+        group_by(s, lectage, dept, service) %>%
+        summarise(m_y = mean(y), m_age = mean(studage))
+
+ggplot(dfs, aes(dept, m_y)) +
+        geom_boxplot(aes(group = dept)) +
+        geom_jitter( height = 0, alpha = .1) +
+        geom_smooth( method = "lm")
+
+
+
+
+
+
 # one-variable bar charts
 # function
 g_bar <- function(varstr, dfr = df) {
@@ -366,4 +389,8 @@ yreg_by("lectage", vcol = "service") ######################
 yreg_by("lectage", "dept")
 yreg_by("lectage", vcol = "dept") #################
 yreg_by("lectage", "dept", "service", meansize = 3)
+
+
+df
+
 
