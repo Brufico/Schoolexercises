@@ -26,7 +26,7 @@ suppressPackageStartupMessages(library(dplyr))
 
 # load data
 # ===========
-df <- read.csv(file = file.path("data", "insteval.csv"),
+df <- read.csv(file = file.path("data", "InstEval.csv"),
                sep = ";", row.names = 1)
 
 head(df)
@@ -36,7 +36,7 @@ tail(df)
 # Data exploration
 # ===============
 
-# remove row with missing values
+# Cleaning - remove row with missing values
 # ------------------------------
 
 #  detect
@@ -45,8 +45,30 @@ sapply(df, function(col) {sum(is.na(col))} )
 df <- df[!is.na(df$studage), ]
 #  verify
 sapply(df, function(col) {sum(is.na(col))} )
-
 tail(df)
+
+
+#  essais par etudiants
+
+unique(df$d)
+
+
+df1 <- df[df$d == 1002,]
+df1 <- arrange(df1, service, dept)
+
+# by student
+dfs <- df %>%
+        group_by(s, lectage, dept, service) %>%
+        summarise(m_y = mean(y), m_age = mean(studage))
+
+ggplot(dfs, aes(dept, m_y)) +
+        geom_boxplot(aes(group = dept)) +
+        geom_jitter( height = 0, alpha = .1) +
+        geom_smooth( method = "lm")
+
+
+
+
 
 
 # one-variable bar charts
@@ -58,6 +80,7 @@ g_bar <- function(varstr, dfr = df) {
 }
 # actual
 g_bar("studage")
+g_bar("lectage")
 g_bar("service")
 g_bar("dept")
 
@@ -77,7 +100,7 @@ ggplot(data = df, aes(x = 1, y = y)) + geom_boxplot( width = 0.5) +
             hjust = -.2)
 
 
-#  ========================================================================================================
+# ==============================================================================================
 # comparing barplots
 
 
@@ -112,26 +135,26 @@ ybar_by <- function(vrow = "." , vcol = ".",
                         dframe
                 }
         }
-        
+
         # compute dataframe of conditional means
         mean_y_df <- df %>%
                 groupif(vrow, vcol, mvrow, mvcol ) %>%
                 summarise(mean_y = mean(y))
-        
+
         # make the ggplot
-        plot <- ggplot(data = df, aes(y)) + 
+        plot <- ggplot(data = df, aes(y)) +
                 geom_bar( aes(y = ..prop..), width = 0.5, fill = colfill) +
                 geom_vline(data = mean_y_df, aes(xintercept = mean_y), color = meancolor) +
                 geom_text(data = mean_y_df, aes(x = mean_y, y = labheight, label = format(mean_y, digits = meandigits)),
                           color = meancolor, hjust = labjust)
-        
-        
+
+
         # + myfacet(vrow, vcol)
-        
+
         if (!mvrow | !mvcol) {
                 plot <- plot + myfacet(row = vrow, col = vcol)
         }
-        
+
         # add title to plot
         if (condpresent <= 0) {
                 plot_title <- "Y distribution and mean"
@@ -142,10 +165,10 @@ ybar_by <- function(vrow = "." , vcol = ".",
         } else {
                 stop( paste0("Error in ybar-by2: bad value for condpresent: ", condpresent) , call. = TRUE )
         }
-                 
-        # return plot        
+
+        # return plot
         plot + labs(title = plot_title)
-                
+
 }
 
 # -----------------------------------------------------------------------------------------
@@ -171,19 +194,19 @@ ybar_by("dept", "service") # evidence of interaction
 
 
 
-ybox_by <- function(vx, vrow = "." , vcol = "." , 
+ybox_by <- function(vx, vrow = "." , vcol = "." ,
                     meansize = 4, meandigits = 3, meancolor = "red",
                     labheight = .2, labjust = -.2) { # all args = strings
         # missing arguments
         mvrow <- missing(vrow)
         mvcol <- missing(vcol)
         condpresent <- 2 - (as.integer(mvrow) + as.integer(mvcol))
-        
+
         # preparation for circomventing nse
         xn <- as.name(vx)
         yn <- as.name("y")
         # compute the means by groups ----------
-        
+
         # function for grouping dataframes
         groupif3 <- function(dframe, vx, vrow, vcol, mvrow, mvcol) {
                 xvar <- as.name(vx)
@@ -199,28 +222,28 @@ ybox_by <- function(vx, vrow = "." , vcol = "." ,
                         group_by_(dframe, xvar)
                 }
         }
-        
+
         # compute dataframe of conditional means
         mean_y_df <- df %>%
                 groupif3(vx, vrow, vcol, mvrow, mvcol ) %>%
                 summarise(mean_y = mean(y))
-        
+
         # make the ggplot
-        
-        plot <- ggplot(data = df, 
+
+        plot <- ggplot(data = df,
                        aes_(xn, yn, group = xn) ) +
-                geom_boxplot(width = 0.5) +
+                geom_boxplot(width = 0.5, varwidth = TRUE) +
                 geom_point(data = mean_y_df, aes(y = mean_y), size = meansize, color = meancolor, alpha = .5 ) +
                 geom_line(data = mean_y_df, aes_(xn, quote(mean_y), group = 1), color = meancolor) +
                 geom_text(data = mean_y_df, aes(y = mean_y, label = format(mean_y, digits = meandigits)),
                           hjust = labjust) # + geom_smooth(aes_(xn, yn), method = "lm")
-        
+
         if (!mvrow | !mvcol) {
                 plot <- plot + myfacet(row = vrow, col = vcol)
         }
-                
-        
-        
+
+
+
         # add title to plot
         if (condpresent <= 0) {
                 plot_title <- paste0("Y distribution and mean by ", vx)
@@ -234,7 +257,7 @@ ybox_by <- function(vx, vrow = "." , vcol = "." ,
 
         # return plot
         plot  + labs(title = plot_title)
-        
+
 }
 
 
@@ -251,5 +274,123 @@ ybox_by("lectage", "service", meancolor = "blue", meansize = 3)
 ybox_by("lectage", "dept", meancolor = "blue", meansize = 3)
 ybox_by("lectage", "dept", "service", meancolor = "blue", meansize = 3)
 
+
+
+# approaches by the mean:
+
+mdf <- df %>%
+        group_by(studage, lectage, service, dept) %>%
+        summarise(mean_y = mean(y), cnt = n())
+
+summary(mdf$mean_y)
+
+
+
+# ========================================================================
+# graphing regressions ========================================================================
+# ========================================================================
+# not yet ok
+
+yreg_by <- function(vx, vrow = "." , vcln = ".", vcol = "",
+                    linreg = TRUE,
+                    meansize = 4, meandigits = 3, meancolor = "red",
+                    labheight = .2, labjust = -.2) { # all args = strings
+        # missing arguments
+        mvrow <- missing(vrow)
+        mvcln <- missing(vcln)
+        mvcol <- missing(vcol)
+        condpresent <- 2 - (as.integer(mvrow) + as.integer(mvcln))
+
+        # preparation for circomventing nse
+        xn <- as.name(vx)
+        yn <- as.name("y")
+        if (!mvcol) {vcol_n <- as.name(vcol)}
+        # compute the means by groups ----------
+
+        # function for grouping dataframes
+        groupif3 <- function(dframe, vx, vrow, vcln, mvrow, mvcln) {
+                xvar <- as.name(vx)
+                rowvar <- as.name(vrow)
+                clnvar <- as.name(vcln)
+                if (!mvrow & ! mvcln) {
+                        group_by_(dframe, xvar, rowvar, clnvar)
+                } else if (!mvrow) {
+                        group_by_(dframe, xvar, rowvar)
+                } else if (!mvcln) {
+                        group_by_(dframe, xvar, clnvar)
+                } else {
+                        group_by_(dframe, xvar)
+                }
+        }
+
+        # compute dataframe of conditional means
+        mean_y_df <- df %>%
+                groupif3(vx, vrow, vcln, mvrow, mvcln ) %>%
+                summarise(mean_y = mean(y))
+
+
+        # make the ggplot
+        # base
+        if (mvcol) {
+              plot <- ggplot(data = df, aes_(xn, yn) )
+        } else {
+                plot <- ggplot(data = df, aes_(xn, yn, color = vcol_n) )
+        }
+        # more components
+        plot <- plot +
+                geom_boxplot(aes_(group = xn), width = 0.5, varwidth = TRUE) +
+                geom_point(data = mean_y_df, aes(y = mean_y), size = meansize, color = meancolor, alpha = .5 ) +
+                geom_line(data = mean_y_df, aes_(xn, quote(mean_y), group = 1), color = meancolor) +
+                geom_text(data = mean_y_df, aes(y = mean_y, label = format(mean_y, digits = meandigits)),
+                          hjust = labjust)
+        # dbug
+        # print(plot)
+        if (linreg) {
+                plot <- plot + geom_smooth(# aes_(xn, yn),
+                                           method = "lm")
+        }
+
+        if (!mvrow | !mvcln) {
+                plot <- plot + myfacet(row = vrow, col = vcln)
+        }
+
+
+
+        # add title to plot
+        if (condpresent <= 0) {
+                plot_title <- paste0("Y distribution and mean by ", vx)
+        } else if (condpresent == 1) {
+                plot_title <- paste0("Y distribution and mean by ", vx, " and ", ifelse (!mvrow , vrow, vcln)  )
+        } else if (condpresent == 2) {
+                plot_title <- paste0("Y distribution  and mean by ", vx, " and ",  vrow, " and ", vcln)
+        } else {
+                stop( paste0("Error in ybar-by2: bad value for condpresent: ", condpresent) , call. = TRUE )
+        }
+
+        # return plot
+        plot  + labs(title = plot_title)
+
+}
+
+
+# application
+
+yreg_by("studage")
+yreg_by("lectage")
+yreg_by("service")
+yreg_by("dept")
+
+
+ybox_by("service", "lectage", meancolor = "blue", meansize = 3)
+
+yreg_by("lectage", "service") #===========================================
+yreg_by("lectage", vcol = "service") ######################
+
+yreg_by("lectage", "dept")
+yreg_by("lectage", vcol = "dept") #################
+yreg_by("lectage", "dept", "service", meansize = 3)
+
+
+df
 
 
