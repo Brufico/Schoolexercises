@@ -79,7 +79,7 @@ makedata <-  function(seed = 46,
         
         # graphes
         #  data
-        dfgr <- data.frame(halfday = c(lam, lpm),
+        dfgr <- data.frame(halfday = factor(c(lam, lpm), levels = c(morning, afternoon)),
                            errors = c(xam, xpm))
         
         # boxplot
