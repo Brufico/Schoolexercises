@@ -54,16 +54,21 @@ makedata <-  function(seed = 46,
                       lambda_afternoon = 10,
                       shiftafternoon = - 4,
                       size = 15,
-                      morethan_after = NULL,
-                      lessthan_after = NULL,
                       morethan_morning = NULL,
-                      lessthan_morning = NULL
+                      lessthan_morning = NULL,                      
+                      morethan_after = NULL,
+                      lessthan_after = NULL
                       ) {
+        # generation
         set.seed(seed)
         xam <- rpois(size, lambda = lambda_morning) + shiftmorning  # matinées
         xpm <- rpois(size, lambda = lambda_afternoon) + shiftafternoon # après-midis
-        
-        
+        # limits
+        if (!is.null(lessthan_morning)) xam[xam > lessthan_morning] <- lessthan_morning
+        if (!is.null(morethan_morning)) xam[xam < morethan_morning] <- morethan_morning
+        if (!is.null(lessthan_after)) xpm[xpm > lessthan_after] <- lessthan_after
+        if (!is.null(morethan_after)) xpm[xpm < morethan_after] <- morethan_after
+        # labels
         lam <- rep(morning, times = size)
         lpm <- rep("Après-midi", times = size)        
         
@@ -100,4 +105,5 @@ makedata(46) # ok
 makedata(50)
 makedata(51, lambda_morning = 6, shiftmorning = 0, lambda_afternoon = 12,shiftafternoon = -4) # ok
 
-makedata(55, lambda_morning = 8, shiftmorning = -2, lambda_afternoon = 10,shiftafternoon = -4) # ok
+makedata(55, lambda_morning = 8, shiftmorning = -2, 
+         lambda_afternoon = 10,shiftafternoon = -4, morethan_after = 3) # ok
