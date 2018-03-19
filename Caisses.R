@@ -17,14 +17,6 @@ library(ggplot2)
 morning <- "Matin"
 afternoon <- "Après-midi"
 
-# 
-# size <- 15
-
-# lambda_morning <- 5
-# shiftmorning <- 0
-# 
-# lambda_afternoon <- 10
-# shiftafternoon <- -4
 
 
 # Summary function definitions
@@ -48,14 +40,14 @@ my_summary <- function(x) {
 
 # Make and show data
 #--------------------
-makedata <-  function(seed = 46, 
-                      lambda_morning = 5,
-                      shiftmorning = 0,
+makedata <-  function(seed = 46, # the random generator seed
+                      lambda_morning = 5, # the poisson parameter (morning)
+                      shiftmorning = 0, # shift = number to add (+) or substract to the random errors (morning)
                       lambda_afternoon = 10,
                       shiftafternoon = - 4,
-                      size = 15,
-                      morethan_morning = NULL,
-                      lessthan_morning = NULL,                      
+                      size = 15, # size of sample to generate
+                      morethan_morning = NULL, # minimum error number
+                      lessthan_morning = NULL, # maximum error number                     
                       morethan_after = NULL,
                       lessthan_after = NULL
                       ) {
@@ -63,7 +55,7 @@ makedata <-  function(seed = 46,
         set.seed(seed)
         xam <- rpois(size, lambda = lambda_morning) + shiftmorning  # matinées
         xpm <- rpois(size, lambda = lambda_afternoon) + shiftafternoon # après-midis
-        # limits
+        # use max and min limits
         if (!is.null(lessthan_morning)) xam[xam > lessthan_morning] <- lessthan_morning
         if (!is.null(morethan_morning)) xam[xam < morethan_morning] <- morethan_morning
         if (!is.null(lessthan_after)) xpm[xpm > lessthan_after] <- lessthan_after
@@ -74,16 +66,13 @@ makedata <-  function(seed = 46,
         
         
         # vérification / summaries
-       
-        
-        # my_summary(xam)
-        # my_summary(xpm )
+
         
         dfsum <- data.frame( Matin = my_summary(xam), Après_midi = my_summary(xpm))
-        print(dfsum)
+        # print(dfsum)
         
         # graphes
-        #  data
+        #  generated sample data: all error number for all halfdays
         dfgr <- data.frame(halfday = factor(c(lam, lpm), levels = c(morning, afternoon)),
                            errors = c(xam, xpm))
         
@@ -101,9 +90,19 @@ makedata <-  function(seed = 46,
 }
 
 
-makedata(46) # ok
+data1 <- makedata(46) # ok
 makedata(50)
-makedata(51, lambda_morning = 6, shiftmorning = 0, lambda_afternoon = 12,shiftafternoon = -4) # ok
+data2 <- makedata(51, lambda_morning = 6, shiftmorning = 0, lambda_afternoon = 12, shiftafternoon = -4) # ok
 
-makedata(55, lambda_morning = 8, shiftmorning = -2, 
+data3 <- makedata(55, lambda_morning = 8, shiftmorning = -2, 
          lambda_afternoon = 10,shiftafternoon = -4, morethan_after = 3) # ok
+
+# see results
+data1
+
+data2
+data3
+
+# new:
+dataB1 <- makedata(46, size = 60, morethan_after = 0, lessthan_morning = 10)
+dataB1
