@@ -102,3 +102,15 @@ gscat_lm_diag <- gscat_lm +
   geom_abline(slope = 1, intercept = 0, #mean(galton$child) - mean(galton$parent),
               color = "red") + geom_text( x= 72.5, y = 72.5, label = "child = parent", color = "red")
 gscat_lm_diag
+
+
+# representing a normal dist
+gnorm  <- ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
+        stat_function(fun = dnorm, n = 101,
+                      args = list(mean = 0, sd = 1),
+                      size = 1.08) + 
+        scale_y_continuous(name =  NULL, breaks = NULL) +
+        scale_x_continuous(NULL, labels = NULL)
+gnorm
+
+
